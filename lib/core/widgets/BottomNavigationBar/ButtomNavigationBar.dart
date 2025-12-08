@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../../../features/wardrobe/wardrobe_page.dart';
 import '../../../features/recommendation/recommendation_page.dart';
+import '../../../features/virtual_try_on/virtual_try_on_page.dart';
 
 // Screen Utilities Class
 class ScreenUtil {
@@ -148,6 +149,8 @@ class _CarouselNavUploadScreenState extends State<CarouselNavUploadScreen>
                       if (selectedNavIndex == 0) ...[
                         SizedBox(height: ScreenUtil.h(3)),
                         _buildRecommendationButton(),
+                        SizedBox(height: ScreenUtil.h(2)),
+                        _buildVirtualTryOnButton(),
                       ],
                     ],
                   ),
@@ -567,6 +570,60 @@ class _CarouselNavUploadScreenState extends State<CarouselNavUploadScreen>
             SizedBox(width: ScreenUtil.w(2)),
             Text(
               'Get Outfit Recommendations',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: ScreenUtil.sp(16),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(width: ScreenUtil.w(2)),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white,
+              size: ScreenUtil.w(4),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVirtualTryOnButton() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(ScreenUtil.w(4)),
+      decoration: BoxDecoration(
+        color: const Color(0xFF74B9FF),
+        borderRadius: BorderRadius.circular(ScreenUtil.w(3)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF74B9FF).withOpacity(0.3),
+            blurRadius: ScreenUtil.w(4),
+            offset: Offset(0, ScreenUtil.h(0.5)),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const VirtualTryOnPage(),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(ScreenUtil.w(3)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.checkroom,
+              color: Colors.white,
+              size: ScreenUtil.w(6),
+            ),
+            SizedBox(width: ScreenUtil.w(2)),
+            Text(
+              'Virtual Try On',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: ScreenUtil.sp(16),
