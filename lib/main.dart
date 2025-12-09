@@ -4,11 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'features/auth/auth_wrapper.dart';
 import 'core/services/storage_service.dart';
 import 'core/services/connectivity_test.dart';
-import 'features/wardrobe/wardrobe_page.dart';
-import 'features/recommendation/recommendation_page.dart';
-import 'features/virtual_try_on/virtual_try_on_page.dart';
-import 'core/widgets/BottomNavigationBar/ButtomNavigationBar.dart';
-import 'features/wardrobe/analytics_page.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
