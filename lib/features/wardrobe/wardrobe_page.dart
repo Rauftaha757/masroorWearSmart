@@ -12,9 +12,12 @@ import '../../core/services/storage_service.dart';
 import '../../features/auth/auth_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'category_detail_page.dart';
+import 'analytics_page.dart';
 
 class WardrobePage extends StatefulWidget {
-  const WardrobePage({Key? key}) : super(key: key);
+  final bool showScaffold;
+
+  const WardrobePage({Key? key, this.showScaffold = true}) : super(key: key);
 
   @override
   State<WardrobePage> createState() => _WardrobePageState();
@@ -502,24 +505,27 @@ class _WardrobePageState extends State<WardrobePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
-      body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                Expanded(child: _buildWardrobeGrid()),
-              ],
-            ),
+    final content = SafeArea(
+      child: FadeTransition(
+        opacity: _fadeAnimation,
+        child: SlideTransition(
+          position: _slideAnimation,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              Expanded(child: _buildWardrobeGrid()),
+            ],
           ),
         ),
       ),
     );
+
+    if (widget.showScaffold) {
+      return Scaffold(backgroundColor: const Color(0xFFF8F9FA), body: content);
+    } else {
+      return content;
+    }
   }
 
   Widget _buildHeader() {

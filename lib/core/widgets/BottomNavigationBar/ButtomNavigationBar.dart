@@ -64,8 +64,8 @@ class _CarouselNavUploadScreenState extends State<CarouselNavUploadScreen>
     NavItem(Icons.home_outlined, 'Home'),
     NavItem(Icons.checkroom_outlined, 'Wardrobe'),
     NavItem(Icons.auto_awesome_outlined, 'Recommendations'),
+    NavItem(Icons.checkroom, 'Try On'),
     NavItem(Icons.folder_outlined, 'Files'),
-    NavItem(Icons.add_circle_outline, 'Add'),
   ];
 
   @override
@@ -75,86 +75,88 @@ class _CarouselNavUploadScreenState extends State<CarouselNavUploadScreen>
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: selectedNavIndex == 1
-          ? const WardrobePage()
+          ? const WardrobePage(showScaffold: false)
           : selectedNavIndex == 2
-              ? const RecommendationPage()
-              : Padding(
-                  padding: EdgeInsets.all(ScreenUtil.w(5)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: ScreenUtil.h(5)),
-                      Text(
-                        currentPage == 0 ? 'Navigation Mode' : 'Upload Mode',
-                        style: TextStyle(
-                          fontSize: ScreenUtil.sp(28),
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      SizedBox(height: ScreenUtil.h(2)),
-                      Text(
-                        currentPage == 0
-                            ? 'Slide up to switch to upload button!'
-                            : 'Slide down to switch back to navigation!',
-                        style: TextStyle(
-                          fontSize: ScreenUtil.sp(16),
-                          color: Colors.grey[600],
-                          height: 1.5,
-                        ),
-                      ),
-                      SizedBox(height: ScreenUtil.h(5)),
-                      Container(
-                        width: double.infinity,
-                        height: ScreenUtil.h(25),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(ScreenUtil.w(4)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: ScreenUtil.w(5),
-                              spreadRadius: 0,
-                              offset: Offset(0, ScreenUtil.h(0.5)),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                currentPage == 0
-                                    ? navItems[selectedNavIndex].icon
-                                    : Icons.cloud_upload,
-                                size: ScreenUtil.w(12),
-                                color: Colors.black54,
-                              ),
-                              SizedBox(height: ScreenUtil.h(1.5)),
-                              Text(
-                                currentPage == 0
-                                    ? navItems[selectedNavIndex].label
-                                    : 'Upload Files',
-                                style: TextStyle(
-                                  fontSize: ScreenUtil.sp(18),
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Add Recommendation Button for Home page
-                      if (selectedNavIndex == 0) ...[
-                        SizedBox(height: ScreenUtil.h(3)),
-                        _buildRecommendationButton(),
-                        SizedBox(height: ScreenUtil.h(2)),
-                        _buildVirtualTryOnButton(),
-                      ],
-                    ],
+          ? const RecommendationPage()
+          : selectedNavIndex == 3
+          ? const VirtualTryOnPage()
+          : Padding(
+              padding: EdgeInsets.all(ScreenUtil.w(5)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: ScreenUtil.h(5)),
+                  Text(
+                    currentPage == 0 ? 'Navigation Mode' : 'Upload Mode',
+                    style: TextStyle(
+                      fontSize: ScreenUtil.sp(28),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
-                ),
+                  SizedBox(height: ScreenUtil.h(2)),
+                  Text(
+                    currentPage == 0
+                        ? 'Slide up to switch to upload button!'
+                        : 'Slide down to switch back to navigation!',
+                    style: TextStyle(
+                      fontSize: ScreenUtil.sp(16),
+                      color: Colors.grey[600],
+                      height: 1.5,
+                    ),
+                  ),
+                  SizedBox(height: ScreenUtil.h(5)),
+                  Container(
+                    width: double.infinity,
+                    height: ScreenUtil.h(25),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(ScreenUtil.w(4)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: ScreenUtil.w(5),
+                          spreadRadius: 0,
+                          offset: Offset(0, ScreenUtil.h(0.5)),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            currentPage == 0
+                                ? navItems[selectedNavIndex].icon
+                                : Icons.cloud_upload,
+                            size: ScreenUtil.w(12),
+                            color: Colors.black54,
+                          ),
+                          SizedBox(height: ScreenUtil.h(1.5)),
+                          Text(
+                            currentPage == 0
+                                ? navItems[selectedNavIndex].label
+                                : 'Upload Files',
+                            style: TextStyle(
+                              fontSize: ScreenUtil.sp(18),
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Add Recommendation Button for Home page
+                  if (selectedNavIndex == 0) ...[
+                    SizedBox(height: ScreenUtil.h(3)),
+                    _buildRecommendationButton(),
+                    SizedBox(height: ScreenUtil.h(2)),
+                    _buildVirtualTryOnButton(),
+                  ],
+                ],
+              ),
+            ),
       bottomNavigationBar: Container(
         height: ScreenUtil.h(9),
         margin: EdgeInsets.all(ScreenUtil.w(5)),
@@ -553,9 +555,7 @@ class _CarouselNavUploadScreenState extends State<CarouselNavUploadScreen>
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const RecommendationPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const RecommendationPage()),
           );
         },
         borderRadius: BorderRadius.circular(ScreenUtil.w(3)),
@@ -607,20 +607,14 @@ class _CarouselNavUploadScreenState extends State<CarouselNavUploadScreen>
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const VirtualTryOnPage(),
-            ),
+            MaterialPageRoute(builder: (context) => const VirtualTryOnPage()),
           );
         },
         borderRadius: BorderRadius.circular(ScreenUtil.w(3)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.checkroom,
-              color: Colors.white,
-              size: ScreenUtil.w(6),
-            ),
+            Icon(Icons.checkroom, color: Colors.white, size: ScreenUtil.w(6)),
             SizedBox(width: ScreenUtil.w(2)),
             Text(
               'Virtual Try On',
