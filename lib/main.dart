@@ -90,7 +90,7 @@ class ResponsiveWrapper extends StatelessWidget {
                   labelSmall: TextStyle(fontFamily: 'PublicSans'),
                 ),
               ),
-              home: AnalyticsPage(),
+              home: CarouselNavUploadScreen(),
             );
           },
         );

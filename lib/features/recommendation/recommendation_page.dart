@@ -33,6 +33,10 @@ class _RecommendationPageState extends State<RecommendationPage> {
   String? _selectedBottomCategory;
   String? _selectedOuterCategory;
 
+  // Like/Dislike feedback for each category
+  Map<String, bool?> _categoryFeedback =
+      {}; // true = like, false = dislike, null = no feedback
+
   // Mapping of categories to local asset images
   Map<String, List<String>> _categoryAssetImages = {
     // Top categories
@@ -249,6 +253,7 @@ class _RecommendationPageState extends State<RecommendationPage> {
       _error = null;
       _recommendation = null;
       _recommendedImages.clear();
+      _categoryFeedback.clear(); // Clear previous feedback
     });
 
     try {
@@ -701,6 +706,9 @@ class _RecommendationPageState extends State<RecommendationPage> {
               ),
             ],
           ),
+          SizedBox(height: 12.h),
+          // Like/Dislike buttons
+          _buildFeedbackButtons(title.toLowerCase()),
           SizedBox(height: 16.h),
           // Show loading indicator when fetching new images for this category
           Builder(
@@ -959,5 +967,112 @@ class _RecommendationPageState extends State<RecommendationPage> {
         },
       );
     }
+  }
+
+  Widget _buildFeedbackButtons(String categoryKey) {
+    final currentFeedback = _categoryFeedback[categoryKey];
+    final isLiked = currentFeedback == true;
+    final isDisliked = currentFeedback == false;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Like Button
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              if (isLiked) {
+                _categoryFeedback[categoryKey] = null; // Toggle off
+              } else {
+                _categoryFeedback[categoryKey] = true; // Set to liked
+              }
+            });
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              color: isLiked
+                  ? const Color(0xFF00B894).withOpacity(0.1)
+                  : Colors.grey[100],
+              borderRadius: BorderRadius.circular(20.r),
+              border: Border.all(
+                color: isLiked ? const Color(0xFF00B894) : Colors.grey[300]!,
+                width: isLiked ? 2 : 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                  color: isLiked ? const Color(0xFF00B894) : Colors.grey[600],
+                  size: 20.w,
+                ),
+                SizedBox(width: 6.w),
+                Text(
+                  'Like',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: isLiked ? FontWeight.w600 : FontWeight.normal,
+                    color: isLiked ? const Color(0xFF00B894) : Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(width: 12.w),
+        // Dislike Button
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              if (isDisliked) {
+                _categoryFeedback[categoryKey] = null; // Toggle off
+              } else {
+                _categoryFeedback[categoryKey] = false; // Set to disliked
+              }
+            });
+          },
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              color: isDisliked
+                  ? const Color(0xFFE84393).withOpacity(0.1)
+                  : Colors.grey[100],
+              borderRadius: BorderRadius.circular(20.r),
+              border: Border.all(
+                color: isDisliked ? const Color(0xFFE84393) : Colors.grey[300]!,
+                width: isDisliked ? 2 : 1,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  isDisliked ? Icons.thumb_down : Icons.thumb_down_outlined,
+                  color: isDisliked
+                      ? const Color(0xFFE84393)
+                      : Colors.grey[600],
+                  size: 20.w,
+                ),
+                SizedBox(width: 6.w),
+                Text(
+                  'Dislike',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    fontWeight: isDisliked
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                    color: isDisliked
+                        ? const Color(0xFFE84393)
+                        : Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

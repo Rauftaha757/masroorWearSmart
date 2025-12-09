@@ -556,24 +556,57 @@ class _WardrobePageState extends State<WardrobePage>
                   color: const Color(0xFF2D3436),
                 ),
               ),
-              GestureDetector(
-                onTap: _showLogoutDialog,
-                child: Container(
-                  padding: EdgeInsets.all(8.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8F9FA),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: const Color(0xFFE9ECEF),
-                      width: 1,
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AnalyticsPage(
+                            gender: _isMenWardrobe ? 'men' : 'women',
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8F9FA),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: const Color(0xFFE9ECEF),
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.analytics,
+                        color: const Color(0xFF636E72),
+                        size: 20.w,
+                      ),
                     ),
                   ),
-                  child: Icon(
-                    Icons.logout,
-                    color: const Color(0xFF636E72),
-                    size: 20.w,
+                  SizedBox(width: 8.w),
+                  GestureDetector(
+                    onTap: _showLogoutDialog,
+                    child: Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8F9FA),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(
+                          color: const Color(0xFFE9ECEF),
+                          width: 1,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.logout,
+                        color: const Color(0xFF636E72),
+                        size: 20.w,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),

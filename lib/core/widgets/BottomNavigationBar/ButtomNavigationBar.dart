@@ -3,6 +3,7 @@ import 'dart:ui';
 import '../../../features/wardrobe/wardrobe_page.dart';
 import '../../../features/recommendation/recommendation_page.dart';
 import '../../../features/virtual_try_on/virtual_try_on_page.dart';
+import '../../../features/wardrobe/analytics_page.dart';
 
 // Screen Utilities Class
 class ScreenUtil {
@@ -65,7 +66,7 @@ class _CarouselNavUploadScreenState extends State<CarouselNavUploadScreen>
     NavItem(Icons.checkroom_outlined, 'Wardrobe'),
     NavItem(Icons.auto_awesome_outlined, 'Recommendations'),
     NavItem(Icons.checkroom, 'Try On'),
-    NavItem(Icons.folder_outlined, 'Files'),
+    NavItem(Icons.analytics, 'Analytics'),
   ];
 
   @override
@@ -80,6 +81,8 @@ class _CarouselNavUploadScreenState extends State<CarouselNavUploadScreen>
           ? const RecommendationPage()
           : selectedNavIndex == 3
           ? const VirtualTryOnPage()
+          : selectedNavIndex == 4
+          ? const AnalyticsPage(gender: 'men')
           : Padding(
               padding: EdgeInsets.all(ScreenUtil.w(5)),
               child: Column(
