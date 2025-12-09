@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/services/auth_service.dart';
 import '../auth/auth_bloc.dart';
-import '../wardrobe/wardrobe_page.dart';
+import '../../core/widgets/BottomNavigationBar/ButtomNavigationBar.dart';
 import 'auth_screen.dart';
 
 class AuthWrapper extends StatelessWidget {
@@ -20,7 +20,7 @@ class AuthWrapper extends StatelessWidget {
               body: Center(child: CircularProgressIndicator()),
             );
           } else if (state is AuthAuthenticated) {
-            return const WardrobePage();
+            return CarouselNavUploadScreen();
           } else if (state is AuthUnauthenticated) {
             // Show authentication screen (login/signup)
             return const AuthScreen();

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:convert';
 
 import '../login/login_ui.dart';
-import '../../../../core/services/auth_service.dart';
+import '../../../../core/services/storage_service.dart';
+import '../../../../models/user_model.dart';
+import '../../auth/auth_bloc.dart';
 import 'signup_bloc.dart';
-import 'signup_event.dart';
 import 'signup_state.dart';
 
 class SmartWearRegisterScreen extends StatefulWidget {
@@ -62,15 +64,41 @@ class _SmartWearRegisterScreenState extends State<SmartWearRegisterScreen> {
       return;
     }
 
-    // Trigger registration through SignupBloc
-    context.read<SignupBloc>().add(
-      SignupButtonPressed(
-        name: _nameController.text.trim(),
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-        // Don't send phone and gender since they're optional
-      ),
+    // Dummy signup - bypass API, always succeed
+    _performDummySignup(context);
+  }
+
+  void _performDummySignup(BuildContext context) async {
+    // Dummy signup - bypass API, always succeed
+    // Create dummy user data
+    final dummyUser = UserModel(
+      id: 'dummy_user_${DateTime.now().millisecondsSinceEpoch}',
+      email: _emailController.text.trim(),
+      name: _nameController.text.trim(),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      isEmailVerified: true,
     );
+
+    // Save dummy authentication data to storage
+    await StorageService.storeAccessToken(
+      'dummy_access_token_${DateTime.now().millisecondsSinceEpoch}',
+    );
+    await StorageService.storeRefreshToken(
+      'dummy_refresh_token_${DateTime.now().millisecondsSinceEpoch}',
+    );
+    await StorageService.storeUserData(jsonEncode(dummyUser.toJson()));
+
+    final expiryTime = DateTime.now().add(const Duration(seconds: 3600));
+    await StorageService.storeTokenExpiry(expiryTime.toIso8601String());
+
+    // Simulate a brief loading delay
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    _showSuccessSnackBar('Registration successful! Welcome!');
+
+    // Trigger AuthBloc to check authentication status (will find dummy data in storage)
+    context.read<AuthBloc>().add(AuthInitialized());
   }
 
   bool _isValidEmail(String email) {
