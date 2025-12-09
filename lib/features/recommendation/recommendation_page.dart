@@ -405,27 +405,53 @@ class _RecommendationPageState extends State<RecommendationPage> {
         '═══════════════════════════════════════════════════════════════\n',
       );
 
-      // Extract image URLs
+      // Extract image URLs from API
       final topUrls = topImages.images.map((img) => img.url).toList();
       final bottomUrls = bottomImages.images.map((img) => img.url).toList();
       final outerUrls = outerImages.images.map((img) => img.url).toList();
 
+      // Get local asset images as fallback/enhancement
+      final normalizedTop = _normalizeCategory(recommendation.top);
+      final normalizedBottom = _normalizeCategory(recommendation.bottom);
+      final normalizedOuter = _normalizeCategory(recommendation.outer);
+
+      final topAssetImages =
+          _categoryAssetImages[normalizedTop] ??
+          _categoryAssetImages[recommendation.top] ??
+          [];
+      final bottomAssetImages =
+          _categoryAssetImages[normalizedBottom] ??
+          _categoryAssetImages[recommendation.bottom] ??
+          [];
+      final outerAssetImages =
+          _categoryAssetImages[normalizedOuter] ??
+          _categoryAssetImages[recommendation.outer] ??
+          [];
+
+      // Combine API images with local assets (assets first, then API)
+      final combinedTopUrls = [...topAssetImages, ...topUrls];
+      final combinedBottomUrls = [...bottomAssetImages, ...bottomUrls];
+      final combinedOuterUrls = [...outerAssetImages, ...outerUrls];
+
       // Log extracted URLs
       print('📸 Extracted Image URLs:');
-      print('   Top URLs (${topUrls.length}):');
-      topUrls.forEach((url) => print('     - $url'));
-      print('   Bottom URLs (${bottomUrls.length}):');
-      bottomUrls.forEach((url) => print('     - $url'));
-      print('   Outer URLs (${outerUrls.length}):');
-      outerUrls.forEach((url) => print('     - $url'));
+      print(
+        '   Top URLs (${combinedTopUrls.length}): ${topAssetImages.length} assets + ${topUrls.length} API',
+      );
+      print(
+        '   Bottom URLs (${combinedBottomUrls.length}): ${bottomAssetImages.length} assets + ${bottomUrls.length} API',
+      );
+      print(
+        '   Outer URLs (${combinedOuterUrls.length}): ${outerAssetImages.length} assets + ${outerUrls.length} API',
+      );
       print('');
 
       setState(() {
         _recommendation = recommendation;
         _recommendedImages = {
-          'top': topUrls,
-          'bottom': bottomUrls,
-          'outer': outerUrls,
+          'top': combinedTopUrls,
+          'bottom': combinedBottomUrls,
+          'outer': combinedOuterUrls,
         };
         // Set initial selected categories to recommended ones (normalized)
         _selectedTopCategory = _findMatchingCategory(

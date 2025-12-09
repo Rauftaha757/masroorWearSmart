@@ -43,59 +43,6 @@ class _WardrobePageState extends State<WardrobePage>
   WeatherData? _weather;
   bool _weatherLoading = false;
   String _weatherCity = 'Islamabad';
-  bool _forceDemoWeather = true; // hardcode demo weather when true
-
-  // Demo weather data for different cities
-  final Map<String, Map<String, dynamic>> _demoWeatherData = {
-    'Islamabad': {
-      'tempC': 22.0,
-      'feelsLike': 23.0,
-      'humidity': 55.0,
-      'windSpeed': 8.0,
-      'description': 'Clear',
-      'icon': '01d',
-    },
-    'Karachi': {
-      'tempC': 28.0,
-      'feelsLike': 30.0,
-      'humidity': 70.0,
-      'windSpeed': 12.0,
-      'description': 'Partly Cloudy',
-      'icon': '02d',
-    },
-    'Lahore': {
-      'tempC': 25.0,
-      'feelsLike': 26.0,
-      'humidity': 60.0,
-      'windSpeed': 10.0,
-      'description': 'Sunny',
-      'icon': '01d',
-    },
-    'Rawalpindi': {
-      'tempC': 21.0,
-      'feelsLike': 22.0,
-      'humidity': 50.0,
-      'windSpeed': 7.0,
-      'description': 'Clear',
-      'icon': '01d',
-    },
-    'Peshawar': {
-      'tempC': 24.0,
-      'feelsLike': 25.0,
-      'humidity': 65.0,
-      'windSpeed': 9.0,
-      'description': 'Cloudy',
-      'icon': '04d',
-    },
-    'Quetta': {
-      'tempC': 18.0,
-      'feelsLike': 17.0,
-      'humidity': 45.0,
-      'windSpeed': 6.0,
-      'description': 'Clear',
-      'icon': '01d',
-    },
-  };
 
   // Getter to return appropriate clothing categories based on toggle
   List<ClothingCategory> get currentClothingCategories {
@@ -408,12 +355,7 @@ class _WardrobePageState extends State<WardrobePage>
 
     _animationController.forward();
     _loadClothingItems();
-    if (_forceDemoWeather) {
-      // Load demo weather for current city
-      _loadDemoWeather();
-    } else {
-      _loadWeather();
-    }
+    _loadWeather();
   }
 
   @override
@@ -455,29 +397,6 @@ class _WardrobePageState extends State<WardrobePage>
       }
       _itemsByCategory[category]!.add(item);
     }
-  }
-
-  void _loadDemoWeather() {
-    setState(() {
-      _weatherLoading = true;
-    });
-
-    // Get weather data for current city or default to Islamabad
-    final cityData =
-        _demoWeatherData[_weatherCity] ?? _demoWeatherData['Islamabad']!;
-
-    setState(() {
-      _weather = WeatherData(
-        city: _weatherCity,
-        tempC: cityData['tempC'],
-        feelsLike: cityData['feelsLike'] ?? cityData['tempC'],
-        humidity: cityData['humidity'] ?? 60.0,
-        windSpeed: cityData['windSpeed'] ?? 10.0,
-        description: cityData['description'],
-        icon: cityData['icon'],
-      );
-      _weatherLoading = false;
-    });
   }
 
   Future<void> _loadWeather() async {
@@ -1068,11 +987,7 @@ class _WardrobePageState extends State<WardrobePage>
         setState(() {
           _weatherCity = value;
         });
-        if (_forceDemoWeather) {
-          _loadDemoWeather();
-        } else {
-          await _loadWeather();
-        }
+        await _loadWeather();
       }
     });
   }
