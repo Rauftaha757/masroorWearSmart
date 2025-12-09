@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/services/wearsmart_api_service.dart';
 import '../../core/services/weather_service.dart';
 import '../../models/recommendation_models.dart';
+import '../virtual_try_on/virtual_try_on_page.dart';
 
 class RecommendationPage extends StatefulWidget {
   final String? gender; // 'men' or 'women'
@@ -844,9 +845,32 @@ class _RecommendationPageState extends State<RecommendationPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Recommended Outfit',
-          style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                'Recommended Outfit',
+                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            SizedBox(width: 8.w),
+            // Virtual Try-On Button
+            ElevatedButton.icon(
+              onPressed: () => _navigateToVirtualTryOn(),
+              icon: Icon(Icons.checkroom, size: 16.w),
+              label: Text('Try-On', style: TextStyle(fontSize: 12.sp)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF74B9FF),
+                foregroundColor: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.r),
+                ),
+              ),
+            ),
+          ],
         ),
         SizedBox(height: 16.h),
         _buildCategorySection(
@@ -867,6 +891,26 @@ class _RecommendationPageState extends State<RecommendationPage> {
           _recommendedImages['outer'] ?? [],
         ),
       ],
+    );
+  }
+
+  void _navigateToVirtualTryOn() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VirtualTryOnPage(
+          recommendedOutfit: {
+            'top': _recommendedImages['top'] ?? [],
+            'bottom': _recommendedImages['bottom'] ?? [],
+            'outer': _recommendedImages['outer'] ?? [],
+          },
+          recommendedCategories: {
+            'top': _recommendation!.top,
+            'bottom': _recommendation!.bottom,
+            'outer': _recommendation!.outer,
+          },
+        ),
+      ),
     );
   }
 
