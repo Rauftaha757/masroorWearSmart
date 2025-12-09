@@ -17,6 +17,9 @@ class RecommendationPage extends StatefulWidget {
 
 class _RecommendationPageState extends State<RecommendationPage> {
   final WearSmartApiService _apiService = WearSmartApiService();
+  final WeatherService _weatherService = WeatherService(
+    apiKey: '4c703f15e3f9220de836884137342d5d',
+  );
   bool _isLoading = false;
   OutfitResponse? _recommendation;
   Map<String, List<String>> _recommendedImages = {};
@@ -27,6 +30,9 @@ class _RecommendationPageState extends State<RecommendationPage> {
   String _selectedTimeOfDay = 'afternoon';
   String _selectedSeason = 'summer';
   String? _selectedMood;
+  String _weatherCity = 'Islamabad';
+  bool _weatherLoading = false;
+  WeatherData? _currentWeather;
 
   // Selected alternatives for each category
   String? _selectedTopCategory;
@@ -181,19 +187,86 @@ class _RecommendationPageState extends State<RecommendationPage> {
   void initState() {
     super.initState();
     _selectedGender = widget.gender ?? 'men';
-    _initializeWeatherData();
+    if (widget.weatherData != null) {
+      _currentWeather = widget.weatherData;
+      _weatherCity = widget.weatherData!.city;
+      _initializeWeatherData();
+    } else {
+      // Fetch weather data on initialization
+      _fetchWeatherData();
+    }
   }
 
   void _initializeWeatherData() {
-    if (widget.weatherData != null) {
-      _temperature = widget.weatherData!.tempC;
-      _feelsLike = widget.weatherData!.feelsLike;
-      _humidity = widget.weatherData!.humidity;
-      _windSpeed = widget.weatherData!.windSpeed;
-      _weatherCondition = _mapWeatherCondition(widget.weatherData!.description);
+    if (_currentWeather != null) {
+      _temperature = _currentWeather!.tempC;
+      _feelsLike = _currentWeather!.feelsLike;
+      _humidity = _currentWeather!.humidity;
+      _windSpeed = _currentWeather!.windSpeed;
+      _weatherCondition = _mapWeatherCondition(_currentWeather!.description);
       _selectedSeason = _determineSeason(_temperature);
       _selectedTimeOfDay = _getCurrentTimeOfDay();
     }
+  }
+
+  Future<void> _fetchWeatherData() async {
+    setState(() {
+      _weatherLoading = true;
+    });
+
+    try {
+      final weather = await _weatherService.fetchByCity(_weatherCity);
+      setState(() {
+        _currentWeather = weather;
+        _initializeWeatherData();
+      });
+    } catch (e) {
+      print('Error fetching weather: $e');
+      // Keep default values if weather fetch fails
+    } finally {
+      setState(() {
+        _weatherLoading = false;
+      });
+    }
+  }
+
+  Future<void> _promptChangeCity() async {
+    final controller = TextEditingController(text: _weatherCity);
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Change City'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Enter city name',
+              labelText: 'City',
+            ),
+            textInputAction: TextInputAction.done,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(controller.text.trim());
+              },
+              child: const Text('Apply'),
+            ),
+          ],
+        );
+      },
+    ).then((value) async {
+      if (value is String && value.isNotEmpty) {
+        setState(() {
+          _weatherCity = value;
+        });
+        await _fetchWeatherData();
+      }
+    });
   }
 
   String _mapWeatherCondition(String description) {
@@ -230,6 +303,11 @@ class _RecommendationPageState extends State<RecommendationPage> {
   }
 
   Future<void> _getRecommendation() async {
+    // Refresh weather data before getting recommendations if not already loading
+    if (_currentWeather == null && !_weatherLoading) {
+      await _fetchWeatherData();
+    }
+
     print('\n');
     print('╔══════════════════════════════════════════════════════════════╗');
     print('║         GETTING RECOMMENDATION - USER ACTION                ║');
@@ -398,6 +476,11 @@ class _RecommendationPageState extends State<RecommendationPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Weather Section
+            _buildWeatherSection(),
+
+            SizedBox(height: 16.h),
+
             // Settings Section
             _buildSettingsSection(),
 
@@ -508,6 +591,161 @@ class _RecommendationPageState extends State<RecommendationPage> {
               (value) => setState(() => _selectedMood = value),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeatherSection() {
+    return Container(
+      padding: EdgeInsets.all(16.w),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6C5CE7), Color(0xFFE84393)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12.w),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10.w,
+            offset: Offset(0, 4.h),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Current Weather',
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              GestureDetector(
+                onTap: _promptChangeCity,
+                child: Container(
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Icon(
+                    Icons.edit_location_alt,
+                    color: Colors.white,
+                    size: 18.w,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 12.h),
+          if (_weatherLoading)
+            Row(
+              children: [
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Text(
+                  'Loading weather...',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+              ],
+            )
+          else if (_currentWeather != null)
+            Row(
+              children: [
+                Image.network(
+                  _weatherService.iconUrl(_currentWeather!.icon),
+                  width: 50.w,
+                  height: 50.w,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(
+                      Icons.wb_sunny,
+                      color: Colors.white,
+                      size: 40.w,
+                    );
+                  },
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            _currentWeather!.city,
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4.h),
+                      Text(
+                        _currentWeather!.description,
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${_currentWeather!.tempC.toStringAsFixed(0)}°C',
+                      style: TextStyle(
+                        fontSize: 24.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    Text(
+                      'Feels like ${_currentWeather!.feelsLike.toStringAsFixed(0)}°C',
+                      style: TextStyle(
+                        fontSize: 10.sp,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            )
+          else
+            Row(
+              children: [
+                Icon(Icons.location_off, color: Colors.white, size: 20.w),
+                SizedBox(width: 8.w),
+                Text(
+                  'Weather data not available',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );
