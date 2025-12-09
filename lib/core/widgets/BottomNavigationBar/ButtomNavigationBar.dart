@@ -83,83 +83,7 @@ class _CarouselNavUploadScreenState extends State<CarouselNavUploadScreen>
           ? const VirtualTryOnPage()
           : selectedNavIndex == 4
           ? const AnalyticsPage(gender: 'men')
-          : Padding(
-              padding: EdgeInsets.all(ScreenUtil.w(5)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: ScreenUtil.h(5)),
-                  Text(
-                    currentPage == 0 ? 'Navigation Mode' : 'Upload Mode',
-                    style: TextStyle(
-                      fontSize: ScreenUtil.sp(28),
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: ScreenUtil.h(2)),
-                  Text(
-                    currentPage == 0
-                        ? 'Slide up to switch to upload button!'
-                        : 'Slide down to switch back to navigation!',
-                    style: TextStyle(
-                      fontSize: ScreenUtil.sp(16),
-                      color: Colors.grey[600],
-                      height: 1.5,
-                    ),
-                  ),
-                  SizedBox(height: ScreenUtil.h(5)),
-                  Container(
-                    width: double.infinity,
-                    height: ScreenUtil.h(25),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(ScreenUtil.w(4)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: ScreenUtil.w(5),
-                          spreadRadius: 0,
-                          offset: Offset(0, ScreenUtil.h(0.5)),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            currentPage == 0
-                                ? navItems[selectedNavIndex].icon
-                                : Icons.cloud_upload,
-                            size: ScreenUtil.w(12),
-                            color: Colors.black54,
-                          ),
-                          SizedBox(height: ScreenUtil.h(1.5)),
-                          Text(
-                            currentPage == 0
-                                ? navItems[selectedNavIndex].label
-                                : 'Upload Files',
-                            style: TextStyle(
-                              fontSize: ScreenUtil.sp(18),
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Add Recommendation Button for Home page
-                  if (selectedNavIndex == 0) ...[
-                    SizedBox(height: ScreenUtil.h(3)),
-                    _buildRecommendationButton(),
-                    SizedBox(height: ScreenUtil.h(2)),
-                    _buildVirtualTryOnButton(),
-                  ],
-                ],
-              ),
-            ),
+          : _buildWelcomePage(),
       bottomNavigationBar: Container(
         height: ScreenUtil.h(9),
         margin: EdgeInsets.all(ScreenUtil.w(5)),
@@ -539,101 +463,64 @@ class _CarouselNavUploadScreenState extends State<CarouselNavUploadScreen>
     );
   }
 
-  Widget _buildRecommendationButton() {
+  Widget _buildWelcomePage() {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(ScreenUtil.w(4)),
+      height: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.black87,
-        borderRadius: BorderRadius.circular(ScreenUtil.w(3)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: ScreenUtil.w(4),
-            offset: Offset(0, ScreenUtil.h(0.5)),
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const RecommendationPage()),
-          );
-        },
-        borderRadius: BorderRadius.circular(ScreenUtil.w(3)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.auto_awesome,
-              color: Colors.white,
-              size: ScreenUtil.w(6),
-            ),
-            SizedBox(width: ScreenUtil.w(2)),
-            Text(
-              'Get Outfit Recommendations',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: ScreenUtil.sp(16),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(width: ScreenUtil.w(2)),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white,
-              size: ScreenUtil.w(4),
-            ),
-          ],
+        gradient: const LinearGradient(
+          colors: [Color(0xFF6C5CE7), Color(0xFFE84393)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
       ),
-    );
-  }
-
-  Widget _buildVirtualTryOnButton() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(ScreenUtil.w(4)),
-      decoration: BoxDecoration(
-        color: const Color(0xFF74B9FF),
-        borderRadius: BorderRadius.circular(ScreenUtil.w(3)),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF74B9FF).withOpacity(0.3),
-            blurRadius: ScreenUtil.w(4),
-            offset: Offset(0, ScreenUtil.h(0.5)),
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const VirtualTryOnPage()),
-          );
-        },
-        borderRadius: BorderRadius.circular(ScreenUtil.w(3)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.checkroom, color: Colors.white, size: ScreenUtil.w(6)),
-            SizedBox(width: ScreenUtil.w(2)),
-            Text(
-              'Virtual Try On',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: ScreenUtil.sp(16),
-                fontWeight: FontWeight.bold,
+      child: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // App Logo/Icon
+              Container(
+                padding: EdgeInsets.all(ScreenUtil.w(6)),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.checkroom,
+                  color: Colors.white,
+                  size: ScreenUtil.w(16),
+                ),
               ),
-            ),
-            SizedBox(width: ScreenUtil.w(2)),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.white,
-              size: ScreenUtil.w(4),
-            ),
-          ],
+              SizedBox(height: ScreenUtil.h(4)),
+              Text(
+                'Welcome to',
+                style: TextStyle(
+                  fontSize: ScreenUtil.sp(18),
+                  color: Colors.white.withOpacity(0.9),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              SizedBox(height: ScreenUtil.h(1)),
+              Text(
+                'wearSmart',
+                style: TextStyle(
+                  fontSize: ScreenUtil.sp(42),
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              SizedBox(height: ScreenUtil.h(2)),
+              Text(
+                'Your Smart Wardrobe Assistant',
+                style: TextStyle(
+                  fontSize: ScreenUtil.sp(16),
+                  color: Colors.white.withOpacity(0.9),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -766,25 +766,45 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
 
   Future<void> _launchShopUrl(String url) async {
     try {
-      final uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Could not open $url'),
-              backgroundColor: const Color(0xFFE84393),
-            ),
-          );
+      // Ensure URL has proper scheme
+      String finalUrl = url;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        finalUrl = 'https://$url';
+      }
+
+      final uri = Uri.parse(finalUrl);
+
+      // Try launching with external application first
+      bool launched = false;
+      try {
+        launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } catch (e) {
+        print('External launch failed, trying in-app: $e');
+        // Fallback to in-app browser
+        try {
+          launched = await launchUrl(uri, mode: LaunchMode.inAppWebView);
+        } catch (e2) {
+          print('In-app launch also failed: $e2');
         }
       }
+
+      if (!launched && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Could not open the link. Please try again.'),
+            backgroundColor: const Color(0xFFE84393),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     } catch (e) {
+      print('Error launching URL: $url - $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error opening link: $e'),
+            content: Text('Error: ${e.toString()}'),
             backgroundColor: const Color(0xFFE84393),
+            duration: const Duration(seconds: 3),
           ),
         );
       }
